@@ -1,0 +1,3 @@
+# Use a rule gate with model fallback under the API budget
+
+The triage pipeline will apply high-precision deterministic rules for clear spam and urgent signals, then use batched Gemini Flash-Lite structured output for messages the Rule Gate cannot safely classify. The normal full-corpus run has an enforceable USD 0.80 maximum, preserving USD 0.20 below the assessment cap. Audit reasons are controlled by a debug switch and excluded from that final run; low, medium, and high confidence bands are derived from the decision path and calibration results rather than model self-ratings. This limits paid inference, makes critical routing behavior inspectable, and preserves model flexibility for Arabic, English, and ambiguous language.
