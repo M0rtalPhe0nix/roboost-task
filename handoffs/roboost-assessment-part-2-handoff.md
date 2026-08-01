@@ -6,10 +6,10 @@ Produce the required written product exercise for the AI Summary tab, grounded i
 
 ## Read first
 
-- Shared vocabulary: `/Users/mohamedomara/Documents/roboost-task/CONTEXT.md` (Review Benchmarking section)
-- Decisions: `/Users/mohamedomara/Documents/roboost-task/docs/adr/0010-separate-observations-from-action-plans.md` through `0012-use-core-model-playbooks-and-client-context.md`
-- Brief: `/Users/mohamedomara/Documents/roboost-task/AI_Engineer_Task.pdf` (Part 2)
-- Review data: `/Users/mohamedomara/Documents/roboost-task/AI Engineer Assessment/Benchmark Reviews/Files/`
+- Shared vocabulary: `./roboost-task/CONTEXT.md` (Review Benchmarking section)
+- Decisions: `./roboost-task/docs/adr/0010-separate-observations-from-action-plans.md` through `0012-use-core-model-playbooks-and-client-context.md`
+- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 2)
+- Review data: `./roboost-task/AI Engineer Assessment/Benchmark Reviews/Files/`
 
 ## Settled scope
 

@@ -6,9 +6,9 @@ Produce the written response for Case Study 2: E-Commerce Marketplace - Product 
 
 ## Read first
 
-- Shared vocabulary: `/Users/mohamedomara/Documents/roboost-task/CONTEXT.md` (Listing Intelligence section)
-- Decisions: `/Users/mohamedomara/Documents/roboost-task/docs/adr/0005-hold-ambiguous-high-risk-listings.md` through `0009-roll-out-injection-detection-in-monitor-mode.md`
-- Brief: `/Users/mohamedomara/Documents/roboost-task/AI_Engineer_Task.pdf` (Part 1, Case Study 2)
+- Shared vocabulary: `./roboost-task/CONTEXT.md` (Listing Intelligence section)
+- Decisions: `./roboost-task/docs/adr/0005-hold-ambiguous-high-risk-listings.md` through `0009-roll-out-injection-detection-in-monitor-mode.md`
+- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 1, Case Study 2)
 
 ## Settled scope
 

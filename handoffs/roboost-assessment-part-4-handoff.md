@@ -6,10 +6,10 @@ Build and run the Option C customer-message triage pipeline, submit classificati
 
 ## Read first
 
-- Shared vocabulary: `/Users/mohamedomara/Documents/roboost-task/CONTEXT.md` (Message Triage section)
-- Decisions: `/Users/mohamedomara/Documents/roboost-task/docs/adr/0001-separate-intent-from-urgency.md` through `0004-freeze-before-held-out-evaluation.md`
-- Data: `/Users/mohamedomara/Documents/roboost-task/AI Engineer Assessment/Messages Dataset/dm_message_corpus_10k.json`
-- Brief: `/Users/mohamedomara/Documents/roboost-task/AI_Engineer_Task.pdf` (Part 4, Option C)
+- Shared vocabulary: `./roboost-task/CONTEXT.md` (Message Triage section)
+- Decisions: `./roboost-task/docs/adr/0001-separate-intent-from-urgency.md` through `0004-freeze-before-held-out-evaluation.md`
+- Data: `./roboost-task/AI Engineer Assessment/Messages Dataset/dm_message_corpus_10k.json`
+- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 4, Option C)
 
 ## Settled scope
 

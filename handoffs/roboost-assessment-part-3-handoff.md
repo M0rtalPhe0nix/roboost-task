@@ -6,10 +6,10 @@ Build and document the working Pharmacy Operations Assistant prototype, plus the
 
 ## Read first
 
-- Shared vocabulary: `/Users/mohamedomara/Documents/roboost-task/CONTEXT.md` (Pharmacy Operations section)
-- Decisions: `/Users/mohamedomara/Documents/roboost-task/docs/adr/0013-treat-part-3-as-a-pharmacy-domain.md` through `0016-use-koyeb-only-for-the-public-demo.md`
-- Data: `/Users/mohamedomara/Documents/roboost-task/AI Engineer Assessment/Operations Dataset/operations_data_anonymized.xlsx`
-- Brief: `/Users/mohamedomara/Documents/roboost-task/AI_Engineer_Task.pdf` (Part 3)
+- Shared vocabulary: `./roboost-task/CONTEXT.md` (Pharmacy Operations section)
+- Decisions: `./roboost-task/docs/adr/0013-treat-part-3-as-a-pharmacy-domain.md` through `0016-use-koyeb-only-for-the-public-demo.md`
+- Data: `./roboost-task/AI Engineer Assessment/Operations Dataset/operations_data_anonymized.xlsx`
+- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 3)
 
 ## Settled scope
 
