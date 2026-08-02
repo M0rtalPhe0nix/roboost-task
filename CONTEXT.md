@@ -64,25 +64,69 @@ _Avoid_: Probability, model self-confidence
 An Arabic-English marketplace in which listings can be Arabic, English, or code-switched across the two languages.
 _Avoid_: Single-language marketplace, translation exception
 
+**Policy Catalog**:
+The versioned, jurisdiction-specific source of approved prohibited-item rules and verified reference sources owned by Legal/Trust & Safety. AI outputs classify evidence against it; they do not define policy.
+_Avoid_: Model policy, inferred law, prompt rules
+
+**Listing Decision**:
+The auditable outcome for one listing, keeping evidence, Publication Action, category outcome, Standardized Description, and review routing distinct.
+_Avoid_: Model response, moderation label, category prediction
+
+**Publication Action**:
+The listing-level moderation outcome: publish, hold unpublished for review, or reject because of a Confirmed Violation. It is independent of the category outcome.
+_Avoid_: Category, risk score, model confidence
+
 **High-Risk Listing**:
 A listing with meaningful but insufficient evidence of a prohibited item. It is held unpublished for human review, not rejected because of review-capacity pressure.
 _Avoid_: Confirmed violation, approved listing
 
 **Confirmed Violation**:
-A listing with unambiguous evidence that it breaches marketplace prohibition policy. It may be automatically rejected.
+A listing whose Validated Fields deterministically match an approved Policy Catalog rule or verified reference source. It may be automatically rejected; model-only suspicion is never a Confirmed Violation.
 _Avoid_: High-risk listing, suspicious listing
 
+**Review Throughput**:
+The number of manual reviews the moderation team can complete, capped at 5% of listings in the assessment. It does not cap safety holds or change the evidence state of a listing.
+_Avoid_: Hold limit, rejection threshold, review queue size
+
 **Review Allocation**:
-The distribution of the marketplace's 5% human-review capacity: 80% for risk-prioritized ambiguous listings, 15% for uncertainty or novelty, and 5% for stratified audit. Emergency safety signals may preempt the queue.
-_Avoid_: Random sample, first-in-first-out queue
+The distribution of Review Throughput: 80% for risk-prioritized ambiguous listings, 15% for uncertainty or novelty, and 5% for stratified audit. Emergency safety signals may preempt the allocation.
+_Avoid_: Random-only allocation, global first-in-first-out queue
+
+**Review Priority Band**:
+A review-ordering tier defined by policy severity and evidence confidence, with FIFO ordering inside each tier. Seller history may raise attention but cannot prove a violation.
+_Avoid_: Universal expected-harm score, seller-value priority, evidence decision
+
+**Listing Cascade**:
+The cost-tiered processing path for listings: deterministic rules first, compact text and vision candidate selection second, and LLM handling only for ambiguity and controlled description generation.
+_Avoid_: LLM-only pipeline, one-model solution
 
 **Category Ontology**:
 The governed semantic layer around the fixed category tree, containing category relationships and Arabic-English aliases. It may identify category gaps but cannot autonomously add production categories.
 _Avoid_: Self-modifying taxonomy, ungoverned category list
 
+**Provisional Category**:
+The best approved category temporarily assigned to a policy-safe but category-ambiguous listing while it enters uncertainty review. It is correctable and is not a safety hold.
+_Avoid_: Category Gap, confirmed category, prohibited-item decision
+
+**Vocabulary Gap**:
+An unfamiliar seller term that denotes an existing approved category and can be resolved through a governed Arabic-English alias.
+_Avoid_: Category Gap, new product type, automatic category
+
 **Category Gap**:
-An explicit abstention outcome for a listing that has no adequate category in the approved Category Ontology. It is queued for taxonomy-owner review.
-_Avoid_: Forced category, new production category
+An explicit outcome for a product type that has no adequate category in the approved Category Ontology. It contributes evidence to emerging-category discovery rather than being forced into a leaf.
+_Avoid_: Vocabulary Gap, Provisional Category, new production category
+
+**Emerging Category Cluster**:
+A coherent, recurring group of Category Gaps across sufficient listings, sellers, and time to warrant a taxonomy-owner proposal. An individual Category Gap is not an Emerging Category Cluster.
+_Avoid_: Automatic category, single novel listing, model-created taxonomy
+
+**Emerging Category Proposal**:
+A moderator-facing candidate derived from an Emerging Category Cluster, with a provisional bilingual name, representative listings, and a suggested parent. It is not an approved production category.
+_Avoid_: Emerging Category Cluster, approved category, automatic taxonomy change
+
+**Shadow Ontology**:
+The non-production space for proposed categories, bilingual names, and suggested parent relationships before taxonomy-owner approval. A proposed child inherits neither category-specific attributes nor policy rules.
+_Avoid_: Category Ontology, production taxonomy, automatic tree update
 
 **Validated Field**:
 A structured listing fact that has passed schema, allow-list, and evidence-link validation. Only Validated Fields may be used by the deterministic policy engine to select a publication action.
@@ -95,6 +139,10 @@ _Avoid_: Confirmed violation, policy decision
 **Tone Profile**:
 An allow-listed presentation setting for standardized descriptions, such as neutral, concise, premium, or friendly. It may change wording but cannot change Validated Fields, category, or moderation.
 _Avoid_: Free-form instruction, product fact
+
+**Standardized Description**:
+A clean, primary-language rendering of a listing composed only from Validated Fields and an optional Tone Profile.
+_Avoid_: Seller description, bilingual duplicate, generated product fact
 
 ## Review Benchmarking
 
@@ -155,7 +203,3 @@ _Avoid_: Measured contributor, proven cause
 **Koyeb Demo Deployment**:
 The optional public preview of the Pharmacy Operations Assistant, deployed as one Koyeb free web service. It is not the canonical runtime because the free instance can scale to zero and has no persistent volume.
 _Avoid_: Production deployment, canonical handoff
-
-**Listing Cascade**:
-The cost-tiered processing path for listings: deterministic rules, compact text and vision candidate selection, then LLM handling only for ambiguity and controlled description generation.
-_Avoid_: LLM-only pipeline, one-model solution

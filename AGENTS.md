@@ -18,6 +18,10 @@ There is no repository-wide build system, package manifest, or test runner yet. 
 
 For documentation changes, validate relative Markdown links and open HTML presentations locally before submitting. Do not record planned commands as if they had been run.
 
+## Specification & Issue Workflow
+
+Use GitHub Issues as the canonical tracker for implementation-ready specifications. Apply `ready-for-agent` only after the problem, solution, user stories, implementation decisions, testing seam, exclusions, and relevant assessment traceability are settled; implementation pull requests should link the originating issue.
+
 ## Coding Style & Naming Conventions
 
 Match the conventions of the toolchain added to the relevant part and commit its formatter/linter configuration with the code. Use descriptive, lowercase kebab-case directory and document names (for example, `part-4-message-triage` and `approach-notes.md`). Keep code, test, and configuration files local to their owning part unless they are genuinely reusable.
