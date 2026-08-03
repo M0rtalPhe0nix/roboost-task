@@ -89,7 +89,7 @@ The number of manual reviews the moderation team can complete, capped at 5% of l
 _Avoid_: Hold limit, rejection threshold, review queue size
 
 **Review Allocation**:
-The distribution of Review Throughput: 80% for risk-prioritized ambiguous listings, 15% for uncertainty or novelty, and 5% for stratified audit. Emergency safety signals may preempt the allocation.
+The initial distribution of Review Throughput: 70% for prohibited gray-zone and detector-disagreement cases, 20% for adversarial, inconsistent, or suspected-counterfeit listings, 1% for representative unknown-category and emerging-product cases, and 9% for stratified audit of auto-approved listings. The allocation may adapt to queue volume, and emergency safety signals may preempt it.
 _Avoid_: Random-only allocation, global first-in-first-out queue
 
 **Review Priority Band**:
@@ -100,9 +100,17 @@ _Avoid_: Universal expected-harm score, seller-value priority, evidence decision
 The cost-tiered processing path for listings: deterministic rules first, compact text and vision candidate selection second, and LLM handling only for ambiguity and controlled description generation.
 _Avoid_: LLM-only pipeline, one-model solution
 
+**Signal Consolidator**:
+The compact component intended to be calibrated to combine independent image, OCR, text-rule, cross-modal, brand-risk, failure, and uncertainty signals into a prohibited-risk state for routing. It is not the Policy Catalog and cannot turn model-only suspicion into a Confirmed Violation.
+_Avoid_: Policy authority, single-model verdict, proof of counterfeiting
+
 **Category Ontology**:
 The governed semantic layer around the fixed category tree, containing category relationships and Arabic-English aliases. It may identify category gaps but cannot autonomously add production categories.
 _Avoid_: Self-modifying taxonomy, ungoverned category list
+
+**UNKNOWN Category Outcome**:
+The machine-readable reject option returned when no approved category clears its category-specific similarity threshold or decision margin. It routes the listing for later resolution as an ordinary ambiguity, Vocabulary Gap, or Category Gap; it is not itself a new production category.
+_Avoid_: Forced leaf category, approved new category, prohibited-item decision
 
 **Provisional Category**:
 The best approved category temporarily assigned to a policy-safe but category-ambiguous listing while it enters uncertainty review. It is correctable and is not a safety hold.
@@ -128,6 +136,10 @@ _Avoid_: Emerging Category Cluster, approved category, automatic taxonomy change
 The non-production space for proposed categories, bilingual names, and suggested parent relationships before taxonomy-owner approval. A proposed child inherits neither category-specific attributes nor policy rules.
 _Avoid_: Category Ontology, production taxonomy, automatic tree update
 
+**Taxonomy Manager**:
+The governed workflow that stores and deduplicates unknown or low-confidence listing embeddings, clusters recurring product types, prepares representative evidence, and routes candidate categories to a taxonomy owner. It may use an LLM to draft a name and definition but cannot publish a taxonomy change.
+_Avoid_: Autonomous taxonomy editor, classifier rebuild, single-listing category creation
+
 **Validated Field**:
 A structured listing fact that has passed schema, allow-list, and evidence-link validation. Only Validated Fields may be used by the deterministic policy engine to select a publication action.
 _Avoid_: Raw listing content, unverified extraction
@@ -141,8 +153,8 @@ An allow-listed presentation setting for standardized descriptions, such as neut
 _Avoid_: Free-form instruction, product fact
 
 **Standardized Description**:
-A clean, primary-language rendering of a listing composed only from Validated Fields and an optional Tone Profile.
-_Avoid_: Seller description, bilingual duplicate, generated product fact
+A clean, schema-validated Arabic and/or English rendering of a listing composed only from supported source facts or Validated Fields and an optional Tone Profile. The Part 1 report serializes it as `normalized_description`.
+_Avoid_: Seller description, unsupported translation, generated product fact
 
 ## Review Benchmarking
 
