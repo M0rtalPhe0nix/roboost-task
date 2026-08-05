@@ -2523,7 +2523,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "adk-connector" },
-    { name = "google-adk", extra = ["eval"] },
+    { name = "google-adk" },
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "pydantic-settings" },
@@ -2531,6 +2531,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "google-adk", extra = ["eval"] },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -2539,7 +2540,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "adk-connector", specifier = ">=0.1.0,<1.0.0" },
-    { name = "google-adk", extras = ["eval"], specifier = ">=2.0.0,<3.0.0" },
+    { name = "google-adk", specifier = ">=2.0.0,<3.0.0" },
     { name = "openpyxl", specifier = ">=3.1.5,<4.0.0" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
     { name = "pydantic-settings", specifier = ">=2.10.0,<3.0.0" },
@@ -2547,6 +2548,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "google-adk", extras = ["eval"], specifier = ">=2.0.0,<3.0.0" },
     { name = "pytest", specifier = ">=8.4.0,<10.0.0" },
     { name = "pytest-cov", specifier = ">=6.2.0,<8.0.0" },
     { name = "ruff", specifier = ">=0.12.0,<1.0.0" },

@@ -44,9 +44,10 @@ source rows, customer IDs, or order IDs.
 ```text
 ADK Web or private Telegram chat
     -> Google ADK Agent (Gemini: intent and explanation)
+       -> latest 10 visible chat messages included in model context
        -> analyze_operations (one allow-listed tool)
           -> OperationsRepository (read-only deterministic pandas calculations)
-             -> local workbook
+             -> local workbook or compact worker dataset
        <- aggregate observations, counts, evidence labels, and warnings
 ```
 
@@ -69,6 +70,15 @@ The launcher preserves an existing `.env` without prompting or overwriting it. U
 `python scripts/run_adk_web.py --no-browser` for a headless launch or `--port PORT` to
 choose another loopback port. To keep the workbook elsewhere, set
 `OPERATIONS_DATA_PATH` in `.env`.
+
+Gemini receives at most the latest 10 human-visible user/assistant messages on each
+model call. Tool-call records inside that window are preserved but do not count toward
+the limit. Configure the window with `CHAT_HISTORY_MESSAGES` (1-50).
+
+The Telegram worker also physically trims older ADK events, evicts idle sessions after
+one hour, keeps at most 25 active sessions, and processes one message at a time by
+default. Configure these safeguards with `SESSION_IDLE_TTL_SECONDS`,
+`MAX_ACTIVE_SESSIONS`, and `MAX_CONCURRENT_MESSAGES`.
 
 ## Run with Docker Compose
 
@@ -140,7 +150,7 @@ data/                    ignored local workbook location
 deploy/                  Northflank worker handoff
 docs/                    COO and engineering guides, plus the Telegram QR asset
 evals/                   live conversational evaluation settings
-scripts/                 one-command local ADK Web bootstrap and launcher
+scripts/                 local launcher and worker-dataset preparation
 tests/                   deterministic contract, analytics, eval-schema, and bot tests
 .env.example             safe configuration template
 compose.yaml             local ADK Web handoff
@@ -158,6 +168,10 @@ pyproject.toml, uv.lock  dependencies and reproducible lockfile
   promotions, cost, weather, traffic, or incident data.
 - Public Telegram access can consume model quota. Sessions are in memory; production
   still requires the controls in the engineering guide.
+- Conversation continuity is limited to the latest 10 visible messages by default;
+  earlier messages are not sent to Gemini.
+- The worker image converts the workbook into a compact typed dataset at build time to
+  avoid openpyxl's runtime memory spike. Data changes therefore require an image rebuild.
 
 ## Handoffs and decisions
 

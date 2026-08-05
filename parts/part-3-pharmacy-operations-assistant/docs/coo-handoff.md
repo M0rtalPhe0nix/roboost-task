@@ -46,7 +46,8 @@ internet or treated as a production dashboard.
 - "What should I look into from the latest complete month?"
 
 Ask one concrete question at a time. Follow-up questions can narrow the result within
-the same chat session.
+the same chat session. The assistant remembers only the latest 10 visible messages when
+answering; start a fresh question with the necessary context if it was discussed earlier.
 
 ## How to read an answer
 

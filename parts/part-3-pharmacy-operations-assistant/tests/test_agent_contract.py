@@ -12,6 +12,7 @@ from app.prompts import SYSTEM_INSTRUCTION
 def test_agent_exposes_only_the_aggregate_analysis_tool() -> None:
     assert root_agent.name == "pharmacy_operations_assistant"
     assert len(root_agent.tools) == 1
+    assert root_agent.before_model_callback is not None
 
 
 def test_prompt_requires_tools_and_declines_unsupported_topics() -> None:
@@ -37,3 +38,11 @@ def test_tool_returns_a_safe_error_when_data_is_unavailable(
 
     assert "error" in result
     assert "safe_response" in result
+
+
+def test_worker_image_uses_prepared_runtime_data() -> None:
+    dockerfile = Path(__file__).parents[1] / "Dockerfile"
+    content = dockerfile.read_text(encoding="utf-8")
+
+    assert "scripts/prepare_runtime_data.py" in content
+    assert "OPERATIONS_DATA_PATH=/app/data/operations.runtime.csv.gz" in content

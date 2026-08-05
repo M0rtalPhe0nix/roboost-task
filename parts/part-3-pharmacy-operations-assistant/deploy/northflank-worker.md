@@ -12,9 +12,11 @@ control.
 ## Image contract
 
 The Docker image contains the app, locked production dependencies, and the ignored local
-workbook at `data/operations_data_anonymized.xlsx`. Build from this Part 3 directory;
-a fresh Git clone does not contain the workbook and therefore cannot build the image
-without the authorized data file.
+workbook at `data/operations_data_anonymized.xlsx`. During the build, the workbook is
+validated and converted to `data/operations.runtime.csv.gz`; the worker reads this
+compact typed dataset to avoid loading Excel with openpyxl inside the 256 MB runtime.
+Build from this Part 3 directory; a fresh Git clone does not contain the workbook and
+therefore cannot build the image without the authorized data file.
 
 ```bash
 docker build --platform linux/amd64 \
@@ -34,7 +36,7 @@ Configure a Northflank **deployment service** with:
 - registry credentials with pull-only access to the private GHCR image;
 - a secret group containing `GOOGLE_API_KEY` and `TELEGRAM_BOT_TOKEN`;
 - `TELEGRAM_PUBLIC_ACCESS=true` only for the short-lived assessment demo; and
-- optionally, the non-secret policy variables documented in `.env.example`.
+- the default session limits in `.env.example` unless load testing supports a change.
 
 For private use, set `TELEGRAM_PUBLIC_ACCESS=false` and configure comma-separated numeric
 IDs in `TELEGRAM_ALLOWED_USER_IDS`.
@@ -53,6 +55,17 @@ After changing code or data:
 Do not paste unfiltered connector logs into tickets or chat: HTTP request URLs may expose
 the Telegram bot token. Never add credentials to the image, repository, or deployment
 documentation.
+
+## Current assessment release
+
+On 2026-08-06, Northflank was updated to the Linux/amd64 image digest
+`sha256:ce22d2afabe87cde90c7ba3b5bb6c6682736cc200a20c365158051120a106dc4`.
+The control plane reported the deployment as `COMPLETED`, with one new container in
+`TASK_RUNNING`; containers from earlier releases were `TASK_KILLED` as expected after
+replacement. The same image completed the representative analytics smoke test under a
+hard 256 MiB Docker memory limit before deployment. A live Telegram conversation check
+is still required after each release because the local smoke test does not call Gemini
+or Telegram.
 
 ## Shutdown and production boundary
 

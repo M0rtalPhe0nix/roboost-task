@@ -49,10 +49,31 @@ COLUMN_NAMES = {
 
 DATE_COLUMNS = [
     "CreatedDate",
-    "ShiftDate",
     "DeliveryTime",
     "AddedToTripTime",
     "PickingUpTime",
+]
+
+RUNTIME_SOURCE_COLUMNS = [
+    "OrderID",
+    "CustomerComment",
+    "CustomerRatingAverage",
+    "BranchID",
+    "DeliveryZoneName",
+    "RiderID",
+    *DATE_COLUMNS,
+]
+
+RUNTIME_FRAME_COLUMNS = [
+    "CustomerRatingAverage",
+    "BranchID",
+    "DeliveryZoneName",
+    "RiderID",
+    "CreatedDate",
+    *METRIC_DEFINITIONS,
+    "late_comment_signal",
+    "has_customer_comment",
+    "delivery_hour",
 ]
 
 LATE_COMMENT_TERMS = (
@@ -133,21 +154,85 @@ class OperationsRepository:
             raise OperationsDataError(
                 f"Operations data was not found at {source}. Set OPERATIONS_DATA_PATH."
             )
-        if source.suffix.lower() == ".csv":
-            frame = pd.read_csv(source)
+        if source.name.lower().endswith(".runtime.csv.gz"):
+            frame = pd.read_csv(
+                source,
+                usecols=RUNTIME_FRAME_COLUMNS,
+                parse_dates=["CreatedDate"],
+                dtype={
+                    "CustomerRatingAverage": "float32",
+                    "BranchID": "category",
+                    "DeliveryZoneName": "category",
+                    "RiderID": "category",
+                    "delivery_duration_minutes": "float32",
+                    "dispatch_lag_minutes": "float32",
+                    "pickup_lag_minutes": "float32",
+                    "late_comment_signal": "bool",
+                    "has_customer_comment": "bool",
+                    "delivery_hour": "int8",
+                },
+            )
+            return cls._from_prepared_frame(frame, policy)
+        if source.name.lower().endswith((".csv", ".csv.gz")):
+            source_columns = pd.read_csv(source, nrows=0).columns
+            frame = pd.read_csv(source, usecols=RUNTIME_SOURCE_COLUMNS)
         elif source.suffix.lower() in {".xlsx", ".xlsm"}:
-            frame = pd.read_excel(source, sheet_name="Data", engine="openpyxl")
+            with pd.ExcelFile(source, engine="openpyxl") as workbook:
+                source_columns = pd.read_excel(workbook, sheet_name="Data", nrows=0).columns
+                frame = pd.read_excel(
+                    workbook,
+                    sheet_name="Data",
+                    usecols=RUNTIME_SOURCE_COLUMNS,
+                )
         else:
             raise OperationsDataError("Only .xlsx, .xlsm, and .csv sources are supported.")
-        return cls(frame, policy)
+        return cls._from_validated_source(frame, source_columns, policy)
 
-    @staticmethod
-    def _prepare(raw: pd.DataFrame) -> pd.DataFrame:
-        missing_columns = sorted(COLUMN_NAMES - set(raw.columns))
+    @classmethod
+    def _from_prepared_frame(
+        cls,
+        frame: pd.DataFrame,
+        policy: AnalysisPolicy | None,
+    ) -> OperationsRepository:
+        missing_columns = sorted(set(RUNTIME_FRAME_COLUMNS) - set(frame.columns))
+        if missing_columns:
+            raise OperationsDataError(
+                f"Runtime data is missing columns: {', '.join(missing_columns)}"
+            )
+        repository = cls.__new__(cls)
+        repository.policy = policy or AnalysisPolicy()
+        repository.frame = frame.loc[:, RUNTIME_FRAME_COLUMNS]
+        repository.data_start = repository.frame["CreatedDate"].min()
+        repository.data_end = repository.frame["CreatedDate"].max()
+        return repository
+
+    @classmethod
+    def _from_validated_source(
+        cls,
+        frame: pd.DataFrame,
+        source_columns: list[str] | pd.Index,
+        policy: AnalysisPolicy | None,
+    ) -> OperationsRepository:
+        missing_columns = sorted(COLUMN_NAMES - set(source_columns))
         if missing_columns:
             raise OperationsDataError(f"Missing required columns: {', '.join(missing_columns)}")
+        repository = cls.__new__(cls)
+        repository.policy = policy or AnalysisPolicy()
+        repository.frame = repository._prepare(frame, validate_source_columns=False)
+        repository.data_start = repository.frame["CreatedDate"].min()
+        repository.data_end = repository.frame["CreatedDate"].max()
+        return repository
 
-        frame = raw.copy()
+    @staticmethod
+    def _prepare(raw: pd.DataFrame, validate_source_columns: bool = True) -> pd.DataFrame:
+        if validate_source_columns:
+            missing_columns = sorted(COLUMN_NAMES - set(raw.columns))
+            if missing_columns:
+                raise OperationsDataError(
+                    f"Missing required columns: {', '.join(missing_columns)}"
+                )
+
+        frame = raw.loc[:, RUNTIME_SOURCE_COLUMNS].copy()
         for column in DATE_COLUMNS:
             frame[column] = pd.to_datetime(frame[column], errors="coerce")
         if frame["CreatedDate"].isna().any():
@@ -171,10 +256,23 @@ class OperationsRepository:
         comments = frame["CustomerComment"].fillna("").astype(str).str.casefold()
         pattern = "|".join(re.escape(term) for term in LATE_COMMENT_TERMS)
         frame["late_comment_signal"] = comments.str.contains(pattern, regex=True)
-        frame["long_delivery"] = (
-            frame["delivery_duration_minutes"] > 90.0
-        )  # overwritten per policy in grouped analysis
+        frame["has_customer_comment"] = frame["CustomerComment"].notna()
         frame["delivery_hour"] = frame["CreatedDate"].dt.hour
+
+        frame = frame.drop(
+            columns=[
+                "OrderID",
+                "CustomerComment",
+                "DeliveryTime",
+                "AddedToTripTime",
+                "PickingUpTime",
+            ]
+        )
+        for column in ["BranchID", "DeliveryZoneName", "RiderID"]:
+            frame[column] = frame[column].astype("category")
+        for column in ["CustomerRatingAverage", *METRIC_DEFINITIONS]:
+            frame[column] = pd.to_numeric(frame[column], downcast="float")
+        frame["delivery_hour"] = pd.to_numeric(frame["delivery_hour"], downcast="integer")
         return frame
 
     def _window(self, period: PeriodName) -> DateWindow:
@@ -227,7 +325,7 @@ class OperationsRepository:
         }
 
     def data_scope(self) -> dict[str, Any]:
-        comments = int(self.frame["CustomerComment"].notna().sum())
+        comments = int(self.frame["has_customer_comment"].sum())
         return {
             "analysis": "data_scope",
             "data_window": (
@@ -249,7 +347,7 @@ class OperationsRepository:
         if data.empty:
             raise OperationsDataError(f"No orders exist in {window.label}.")
         low_rating_count = int((data["CustomerRatingAverage"] <= 2).sum())
-        comment_count = int(data["CustomerComment"].notna().sum())
+        comment_count = int(data["has_customer_comment"].sum())
         return {
             "analysis": "operations_summary",
             "period": window.label,
@@ -346,7 +444,7 @@ class OperationsRepository:
     ) -> pd.DataFrame:
         grouped = data.groupby("BranchID", dropna=False)
         result = grouped.agg(
-            orders=("OrderID", "size"),
+            orders=("CreatedDate", "size"),
             valid_observations=(metric, "count"),
             active_days=("CreatedDate", lambda values: values.dt.date.nunique()),
             median_minutes=(metric, "median"),
@@ -374,13 +472,13 @@ class OperationsRepository:
         )
         column = dimension_columns[dimension]
         grouped = data.dropna(subset=[column]).groupby(column, dropna=False).agg(
-            orders=("OrderID", "size"),
+            orders=("CreatedDate", "size"),
             valid_delivery_observations=("delivery_duration_minutes", "count"),
             active_days=("CreatedDate", lambda values: values.dt.date.nunique()),
             long_delivery_orders=("long_delivery", "sum"),
             median_delivery_minutes=("delivery_duration_minutes", "median"),
             late_comment_signals=("late_comment_signal", "sum"),
-            comments=("CustomerComment", "count"),
+            comments=("has_customer_comment", "sum"),
         ).reset_index()
         grouped["completeness"] = grouped["valid_delivery_observations"] / grouped["orders"]
         floor = self.policy.min_comparison_orders if dimension in {"branch", "hour"} else 20

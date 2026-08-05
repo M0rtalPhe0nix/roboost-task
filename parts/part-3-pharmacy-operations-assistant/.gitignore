@@ -8,3 +8,4 @@ htmlcov/
 .adk/
 .google-agents-cli/
 data/operations_data_anonymized.xlsx
+data/operations.runtime.csv.gz

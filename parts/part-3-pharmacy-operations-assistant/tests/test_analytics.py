@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from app.analytics import OperationsDataError, OperationsRepository
+from scripts.prepare_runtime_data import prepare_runtime_data
 
 
 def test_derives_metrics_and_excludes_negative_intervals(
@@ -88,7 +89,7 @@ def test_rejects_unknown_metric_period_and_dimension(
 
 
 def test_loads_csv_and_rejects_unknown_file_types(
-    repository: OperationsRepository, tmp_path: Path
+    repository: OperationsRepository, source_frame, tmp_path: Path
 ) -> None:
     source_columns = [
         "OrderID",
@@ -106,7 +107,7 @@ def test_loads_csv_and_rejects_unknown_file_types(
         "PickingUpTime",
     ]
     csv_path = tmp_path / "operations.csv"
-    repository.frame[source_columns].to_csv(csv_path, index=False)
+    source_frame[source_columns].to_csv(csv_path, index=False)
 
     loaded = OperationsRepository.from_path(csv_path, repository.policy)
     assert len(loaded.frame) == len(repository.frame)
@@ -117,12 +118,27 @@ def test_loads_csv_and_rejects_unknown_file_types(
         OperationsRepository.from_path(bad_path)
 
 
-def test_validates_source_contract(repository: OperationsRepository) -> None:
-    missing_column = repository.frame.drop(columns=["BranchID"])
+def test_prepared_runtime_data_preserves_analytics(
+    source_frame, tmp_path: Path
+) -> None:
+    source_path = tmp_path / "operations.csv"
+    runtime_path = tmp_path / "operations.runtime.csv.gz"
+    source_frame.to_csv(source_path, index=False)
+
+    prepare_runtime_data(source_path, runtime_path)
+    repository = OperationsRepository.from_path(runtime_path)
+
+    assert len(repository.frame) == len(source_frame)
+    assert repository.data_scope()["branches"] == 3
+    assert repository.frame.memory_usage(index=True, deep=True).sum() < 10_000
+
+
+def test_validates_source_contract(source_frame) -> None:
+    missing_column = source_frame.drop(columns=["BranchID"])
     with pytest.raises(OperationsDataError, match="Missing required columns"):
         OperationsRepository(missing_column)
 
-    duplicated = repository.frame.copy()
+    duplicated = source_frame.copy()
     duplicated.loc[1, "OrderID"] = duplicated.loc[0, "OrderID"]
     with pytest.raises(OperationsDataError, match="OrderID must be unique"):
         OperationsRepository(duplicated)

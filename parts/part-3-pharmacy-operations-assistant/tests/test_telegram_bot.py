@@ -8,6 +8,7 @@ from adk_connectors.models.incoming import IncomingMessage
 from pydantic import SecretStr
 
 from app.config import Settings
+from app.session_memory import BoundedInMemorySessionService, BoundedMemorySessionStorage
 from app.telegram_bot import (
     TelegramAuthorizationGate,
     build_telegram_connector,
@@ -97,6 +98,41 @@ def test_public_mode_still_rejects_group_chats() -> None:
     assert "only in a private chat" in adapter.send_message.await_args.args[1].text
 
 
+def test_authorization_gate_limits_global_message_concurrency() -> None:
+    async def exercise() -> int:
+        adapter = AsyncMock()
+        release = asyncio.Event()
+        first_started = asyncio.Event()
+        active = 0
+        maximum_active = 0
+
+        async def downstream(_message: IncomingMessage) -> None:
+            nonlocal active, maximum_active
+            active += 1
+            maximum_active = max(maximum_active, active)
+            first_started.set()
+            await release.wait()
+            active -= 1
+
+        gate = TelegramAuthorizationGate(
+            frozenset(),
+            True,
+            adapter,
+            downstream,
+            max_concurrent_messages=1,
+        )
+        first = asyncio.create_task(gate(incoming_message(user_id="1")))
+        await first_started.wait()
+        second = asyncio.create_task(gate(incoming_message(user_id="2")))
+        await asyncio.sleep(0)
+        assert active == 1
+        release.set()
+        await asyncio.gather(first, second)
+        return maximum_active
+
+    assert asyncio.run(exercise()) == 1
+
+
 def test_build_connector_registers_access_gate(monkeypatch) -> None:
     class FakeAdapter:
         def __init__(self) -> None:
@@ -127,6 +163,11 @@ def test_build_connector_registers_access_gate(monkeypatch) -> None:
     assert connector.kwargs["token"] == "bot-token"
     assert connector.kwargs["streaming"] is False
     assert connector.kwargs["app_name"] == "app"
+    assert isinstance(connector.kwargs["session_storage"], BoundedMemorySessionStorage)
+    assert isinstance(
+        connector.kwargs["adk_session_service"], BoundedInMemorySessionService
+    )
+    assert connector.kwargs["connector_config"].session.ttl_seconds == 3600
     assert isinstance(connector.adapter.handler, TelegramAuthorizationGate)
 
 

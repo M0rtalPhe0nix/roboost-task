@@ -19,6 +19,7 @@ from .analytics import (
     load_repository,
 )
 from .config import get_settings
+from .history import limit_model_history
 from .prompts import SYSTEM_INSTRUCTION
 
 
@@ -73,6 +74,7 @@ root_agent = Agent(
     description="Evidence-bound operational analytics for a 132-branch pharmacy group.",
     instruction=SYSTEM_INSTRUCTION,
     tools=[analyze_operations],
+    before_model_callback=limit_model_history(settings.chat_history_messages),
 )
 
 app = App(root_agent=root_agent, name="app")

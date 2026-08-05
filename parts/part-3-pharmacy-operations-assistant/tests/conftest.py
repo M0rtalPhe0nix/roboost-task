@@ -37,7 +37,7 @@ def _order(
 
 
 @pytest.fixture
-def repository() -> Iterator[OperationsRepository]:
+def source_frame() -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     number = 0
     for month, branch, delivery_minutes, count in [
@@ -67,6 +67,11 @@ def repository() -> Iterator[OperationsRepository]:
     # Make July the partial current month so June is the latest complete month.
     number += 1
     rows.append(_order(number, "BR-A", pd.Timestamp("2026-07-03 10:00:00"), 50))
+    return pd.DataFrame(rows)
+
+
+@pytest.fixture
+def repository(source_frame: pd.DataFrame) -> Iterator[OperationsRepository]:
     policy = AnalysisPolicy(
         min_comparison_orders=3,
         min_comparison_days=2,
@@ -74,4 +79,4 @@ def repository() -> Iterator[OperationsRepository]:
         long_delivery_minutes=50,
         max_results=8,
     )
-    yield OperationsRepository(pd.DataFrame(rows), policy)
+    yield OperationsRepository(source_frame, policy)
