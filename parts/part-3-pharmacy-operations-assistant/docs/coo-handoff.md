@@ -22,18 +22,18 @@ information. The supplied workbook is already connected; you do not need to uplo
 Ask a technical operator to start the local prototype from the Part 3 directory:
 
 ```bash
-cp .env.example .env
-# Add GOOGLE_API_KEY and confirm the workbook is in data/operations_data_anonymized.xlsx.
-uv sync --locked
-uv run adk web --host 127.0.0.1 --port 8000 --no-reload .
+python scripts/run_adk_web.py
 ```
+
+On first run, the launcher asks privately for the Gemini API key, creates the local
+`.env`, installs uv if needed, installs the locked dependencies, starts ADK Web, and
+opens the browser automatically. It does not replace an existing `.env`.
 
 Then:
 
-1. Open <http://localhost:8000> on that same computer.
-2. Select `app` from the agent list.
-3. Start a new session and type a question in the message box.
-4. Stop the prototype with **Ctrl+C** in the terminal when finished.
+1. In the page opened at <http://localhost:8000>, select `app` from the agent list.
+2. Start a new session and type a question in the message box.
+3. Stop the prototype with **Ctrl+C** in the terminal when finished.
 
 ADK Web is a local assessment and debugging interface. It must not be published to the
 internet or treated as a production dashboard.

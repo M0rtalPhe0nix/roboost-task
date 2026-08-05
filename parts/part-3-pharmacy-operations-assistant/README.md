@@ -13,7 +13,7 @@ the authoritative source: 64,619 pharmacy delivery orders across 132 branches.
 | Interface | Best for | How to open it |
 | --- | --- | --- |
 | Telegram | Fast assessor or COO review | Open [@pharmacy_operations_bot](https://t.me/pharmacy_operations_bot) or scan the QR code in the [COO guide](docs/coo-handoff.md#option-1-telegram-recommended). |
-| ADK Web | Local development and transparent tool inspection | Follow [Run ADK Web locally](#run-adk-web-locally), then open <http://localhost:8000> and select `app`. |
+| ADK Web | Local development and transparent tool inspection | Run `python scripts/run_adk_web.py`; the launcher prepares the project and opens the UI. |
 
 Telegram accepts private chats only. The public assessment bot is temporary and must
 not receive confidential, patient, prescription, or employee information. ADK Web is a
@@ -52,19 +52,23 @@ ADK Web or private Telegram chat
 
 ## Run ADK Web locally
 
-Prerequisites: Python 3.11-3.14, [uv](https://docs.astral.sh/uv/), a Gemini API key,
+Prerequisites: Python 3.11-3.14, a Gemini API key, internet access for first-time setup,
 and the supplied workbook at `data/operations_data_anonymized.xlsx`.
 
 ```bash
-cp .env.example .env
-# Add GOOGLE_API_KEY to .env.
-uv sync --locked
-uv run adk web --host 127.0.0.1 --port 8000 --no-reload .
+python scripts/run_adk_web.py
 ```
 
-Open <http://localhost:8000>, select `app`, and start a new chat. To keep the workbook
-elsewhere, set `OPERATIONS_DATA_PATH` in `.env`. For terminal chat, run
-`uv run adk run app`.
+On first run, the launcher securely prompts for the Gemini API key if `.env` is absent,
+installs [uv](https://docs.astral.sh/uv/) for the current user if needed, installs the
+locked dependencies, starts ADK Web on loopback, and opens <http://localhost:8000> in
+the default browser. Select `app` and start a new chat. Press **Ctrl+C** in the launcher
+terminal to stop the server.
+
+The launcher preserves an existing `.env` without prompting or overwriting it. Use
+`python scripts/run_adk_web.py --no-browser` for a headless launch or `--port PORT` to
+choose another loopback port. To keep the workbook elsewhere, set
+`OPERATIONS_DATA_PATH` in `.env`.
 
 ## Run with Docker Compose
 
@@ -136,6 +140,7 @@ data/                    ignored local workbook location
 deploy/                  Northflank worker handoff
 docs/                    COO and engineering guides, plus the Telegram QR asset
 evals/                   live conversational evaluation settings
+scripts/                 one-command local ADK Web bootstrap and launcher
 tests/                   deterministic contract, analytics, eval-schema, and bot tests
 .env.example             safe configuration template
 compose.yaml             local ADK Web handoff
