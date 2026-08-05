@@ -1,0 +1,13 @@
+services:
+  assistant:
+    build: .
+    env_file:
+      - .env
+    environment:
+      OPERATIONS_DATA_PATH: /data/operations_data_anonymized.xlsx
+    command: ["uv", "run", "--no-dev", "adk", "web", "--host", "0.0.0.0", "--port", "8000", "--no-reload", "."]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${OPERATIONS_DATA_FILE:-./data/operations_data_anonymized.xlsx}:/data/operations_data_anonymized.xlsx:ro
+    restart: unless-stopped

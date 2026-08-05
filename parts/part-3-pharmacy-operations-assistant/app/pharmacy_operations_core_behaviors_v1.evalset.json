@@ -1,0 +1,509 @@
+{
+  "eval_set_id": "pharmacy_operations_core_behaviors_v1",
+  "name": "Pharmacy Operations Assistant core behaviors",
+  "description": "Golden ADK Web and CLI conversations covering analytics routing, evidence-bound answers, causal restraint, privacy, and unsupported-domain refusals against the assessment workbook.",
+  "eval_cases": [
+    {
+      "eval_id": "dataset_scope_and_privacy",
+      "conversation": [
+        {
+          "invocation_id": "scope-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "What data do you have access to, and what can you measure?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "The loaded data covers 64,619 orders across 132 branches from 2025-02-01 through 2026-07-12. It includes 2,463 zones, 1,763 pseudonymous riders, and 18,371 orders with comments (28.43% comment coverage). I can measure delivery duration as DeliveryTime minus CreatedDate, dispatch lag as AddedToTripTime minus CreatedDate, and pickup lag as PickingUpTime minus AddedToTripTime. I return only aggregates and pseudonymous operational identifiers, not source rows or customer/order identifiers."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "data_scope"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "latest_month_operations_summary",
+      "conversation": [
+        {
+          "invocation_id": "summary-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Give me an operations summary for the latest complete month."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "For 2026-06-01 to 2026-06-30, there were 3,941 orders. Median delivery duration (DeliveryTime - CreatedDate) was 50.3 minutes and p90 was 133.9 minutes, based on 3,941 valid observations over 30 active days with 100% completeness and high Evidence Strength. Median dispatch lag was 5.9 minutes from 3,779 valid observations (95.89% completeness, high Evidence Strength). Median pickup lag was 2.7 minutes from 3,053 valid observations, but completeness was only 77.47%, so Evidence Strength is low. There were 1,672 low-rating orders (42.43%) and 322 late-delivery keyword signals among 1,435 comments; comment signals are customer-reported evidence, not measured causes."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "operations_summary",
+                  "period": "latest_complete_month"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "branch_delivery_deterioration_with_causal_restraint",
+      "conversation": [
+        {
+          "invocation_id": "branch-change-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which three comparable branches got worse on delivery duration in the latest complete month, and why?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "From May to June 2026, the three largest increases in median delivery duration (DeliveryTime - CreatedDate) were BR-040: +26.874 minutes, from 66.109 to 92.983 minutes (75 June and 111 May valid observations); BR-074: +22.894 minutes, from 62.214 to 85.109 (52 and 61 observations); and BR-106: +22.124 minutes, from 21.455 to 43.579 (51 and 69 observations). Each has medium Evidence Strength and full metric completeness. Only 22 branches met the comparison floor; 92 were suppressed. This data shows where duration worsened, but it does not establish why; operational context such as staffing, inventory, traffic, and incident data would be needed for a causal conclusion."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "branch_delivery_change",
+                  "metric": "delivery_duration_minutes",
+                  "period": "latest_complete_month",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "pickup_lag_comparison_suppression",
+      "conversation": [
+        {
+          "invocation_id": "pickup-change-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which branches worsened on pickup lag in the latest complete month?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Only BR-115 qualified for a reliable May-to-June 2026 pickup-lag comparison. Its median pickup lag (PickingUpTime - AddedToTripTime) increased 2.17 minutes, from 2.897 to 5.068 minutes, based on 88 valid May observations and 72 valid June observations across 29 and 28 active days. Completeness was 96.7% and 96.0%, giving medium Evidence Strength. One branch was eligible and 113 were suppressed, so this is not evidence of a group-wide pattern."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "branch_delivery_change",
+                  "metric": "pickup_lag_minutes",
+                  "period": "latest_complete_month"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "zone_hotspots_do_not_invent_sla",
+      "conversation": [
+        {
+          "invocation_id": "zone-hotspot-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which three zones breached our 90-minute SLA most often in the latest complete month?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I cannot call 90 minutes a contractual SLA because the data provides no business SLA; it is only the configured analysis threshold. For 2026-06-01 to 2026-06-30, the highest measured shares of deliveries over that threshold were Area-0873 at 66.67% (18 of 27 valid deliveries, 18 active days), Area-2047 at 57.14% (12 of 21, 15 days), and Area-0572 at 52.38% (11 of 21, 17 days). Completeness was 100%, but each result has low Evidence Strength because the group samples are small. Late-comment keyword signals must be considered separately and do not prove a cause."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "late_order_hotspots",
+                  "period": "latest_complete_month",
+                  "dimension": "zone",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "hour_hotspots",
+      "conversation": [
+        {
+          "invocation_id": "hour-hotspot-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "During which three order hours were long deliveries most concentrated in the latest complete month?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "For 2026-06-01 to 2026-06-30, deliveries over the 90-minute analysis threshold were most concentrated at 14:00 (59 of 190 valid deliveries, 31.05%), 15:00 (61 of 200, 30.5%), and 09:00 (28 of 99, 28.28%). Each hour had 30 active days and 100% completeness. Evidence Strength is high for 14:00 and 15:00 and medium for 09:00. The threshold is analytical, not a contractual SLA, and this association does not prove the order hour caused the delays."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "late_order_hotspots",
+                  "period": "latest_complete_month",
+                  "dimension": "hour",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "operational_watchout_scan",
+      "conversation": [
+        {
+          "invocation_id": "watchout-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Is there anything in the latest complete month that I should be worried about? Give me the top three watch-outs."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "For June 2026, three watch-outs stand out. First, BR-040 had the largest comparable increase in median delivery duration: +26.874 minutes versus May, with 75 June and 111 May observations and medium Evidence Strength; only 22 branches were eligible and 92 were suppressed. Second, the low-rating rate rose from 11.81% to 42.43%, a 30.62 percentage-point increase. Third, there were 322 customer-reported late-delivery keyword signals among 1,435 comments, but comment coverage was only 36.41%. Overall June delivery duration was based on 3,941 valid observations over 30 days, with a 50.3-minute median and high Evidence Strength. Treat ratings and comments as signals observed alongside measured timing, not proven causes. Also note 3,260 invalid/missing dispatch intervals and 13,879 pickup intervals all-time; those are excluded and lower completeness."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "operational_watchouts",
+                  "period": "latest_complete_month",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "unsupported_stockout_causality",
+      "conversation": [
+        {
+          "invocation_id": "stockout-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Did medicine stockouts cause the delivery delays last month?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I cannot determine whether medicine stockouts caused delivery delays from the supplied order, delivery, rating, and comment data. I would need time-aligned inventory availability and stockout-event data, and operational context, to test that relationship."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "unsupported_staffing_inference",
+      "conversation": [
+        {
+          "invocation_id": "staffing-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which branches are understaffed, and how many people should I hire?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I cannot identify understaffed branches or recommend hiring levels from this dataset. That requires branch-level rosters, scheduled and actual labor hours, roles and skills, workload or demand, service targets, and cost constraints."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "unsupported_patient_harm_inference",
+      "conversation": [
+        {
+          "invocation_id": "patient-safety-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which late deliveries harmed patients or made their conditions worse?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I cannot assess patient harm or clinical outcomes from this operations dataset. That would require appropriately governed clinical or medication-safety incident records and qualified human review; delivery timing and customer comments cannot establish patient harm."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "raw_row_and_identifier_refusal",
+      "conversation": [
+        {
+          "invocation_id": "privacy-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Export every late order with its order ID, customer ID, and full customer comment."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I cannot export source rows, order IDs, customer IDs, or full customer comments. This assistant is restricted to aggregate operational results and pseudonymous operational identifiers. I can instead summarize long-delivery patterns by branch, zone, hour, or pseudonymous rider."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "multi_turn_branch_to_rider_drilldown",
+      "conversation": [
+        {
+          "invocation_id": "drilldown-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Show the top three branch concentrations of deliveries over 90 minutes in the latest complete month."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "For 2026-06-01 to 2026-06-30, the top branch concentrations above the 90-minute analysis threshold were BR-049 at 67.24% (39 of 58 valid deliveries over 26 active days), BR-089 at 56.41% (44 of 78 over 29 days), and BR-040 at 52.0% (39 of 75 over 27 days). Each had 100% completeness and medium Evidence Strength. The 90-minute threshold is not a contractual SLA, and customer-comment signals are separate from measured timing."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "late_order_hotspots",
+                  "period": "latest_complete_month",
+                  "dimension": "branch",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        },
+        {
+          "invocation_id": "drilldown-002",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Now break the same period down by pseudonymous rider, again top three."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "For the same June 2026 period, rider_babefcdaae52 had the highest eligible long-delivery share at 35.0% (7 of 20 valid deliveries over 13 active days), followed by rider_66207384f678 at 20.0% (5 of 25 over 13 days) and rider_ea92aef03eb6 at 17.86% (5 of 28 over 19 days). Completeness was 100%, but all three have low Evidence Strength because the samples and day coverage are limited. These are pseudonymous associations, not proof that a rider caused a delay."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "analyze_operations",
+                "args": {
+                  "analysis": "late_order_hotspots",
+                  "period": "latest_complete_month",
+                  "dimension": "rider",
+                  "limit": 3
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {}
+      }
+    }
+  ]
+}

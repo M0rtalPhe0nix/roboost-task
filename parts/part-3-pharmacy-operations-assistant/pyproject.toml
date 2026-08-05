@@ -1,0 +1,39 @@
+[project]
+name = "roboost-pharmacy-operations-assistant"
+version = "0.1.0"
+description = "An evidence-bound pharmacy operations chat agent built with Google ADK."
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "adk-connector>=0.1.0,<1.0.0",
+  "google-adk[eval]>=2.0.0,<3.0.0",
+  "openpyxl>=3.1.5,<4.0.0",
+  "pandas>=2.3.0,<4.0.0",
+  "pydantic-settings>=2.10.0,<3.0.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4.0,<10.0.0",
+  "pytest-cov>=6.2.0,<8.0.0",
+  "ruff>=0.12.0,<1.0.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

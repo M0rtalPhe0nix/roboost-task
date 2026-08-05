@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.adk/
+.google-agents-cli/
+data/operations_data_anonymized.xlsx
