@@ -22,22 +22,19 @@ Parts 1 and 4 each require one selected option. The selections above are the one
 │   ├── part-2-competitive-benchmarking/       # HTML product-exercise presentation
 │   ├── part-3-pharmacy-operations-assistant/  # Runnable prototype and handoffs
 │   └── part-4-message-triage/                 # Runnable pipeline and classifications
-├── shared/                                    # Reusable code or schemas only when justified
-├── docs/
-│   ├── adr/                                   # Cross-cutting decision records
-│   └── assessment/                            # Final cross-part submission material
+├── adrs/                                      # Cross-cutting decision records
 ├── handoffs/                                  # Current task-by-task continuation notes
 ├── CONTEXT.md                                 # Shared assessment vocabulary
 └── AI_Engineer_Task.docx.pdf                  # Source brief (local reference)
 ```
 
-The assessment datasets live under `AI Engineer Assessment/`. That directory is intentionally ignored: source data, API keys, tokens, local exports, and generated working files must never be committed.
+The assessment datasets live under its corresponding part.
 
 ## How to use this repository
 
 1. Start in the README for the part you are working on; it lists its scope, deliverables, guardrails, and intended artifact locations.
 2. Read the matching file in [`handoffs/`](handoffs/) and any linked ADRs before changing a part's design.
-3. Put source code, tests, documents, and reproducible outputs in that part's workspace. Keep cross-cutting utilities in `shared/` only after at least two parts genuinely need them. Part 1's final source artifacts are [`part1-report.md`](parts/part-1-product-listing-intelligence/outputs/part1-report.md) and [`Part1.svg`](parts/part-1-product-listing-intelligence/outputs/Part1.svg).
+3. Put source code, tests, documents, and reproducible outputs in that part's workspace.
 4. Update the part README with real run, evaluation, cost, and deployment evidence as the work is completed. Do not replace planned values with unverified claims.
 
 ## Documentation and decision sources
@@ -62,5 +59,5 @@ The assessment datasets live under `AI Engineer Assessment/`. That directory is 
 | --- | --- |
 | 1 | Final written case study and architecture diagram completed |
 | 2 | Documentation and analysis workspace scaffolded |
-| 3 | Prototype and handoff workspace scaffolded |
-| 4 | Pipeline and classification-output workspace scaffolded |
+| 3 | Prototype and handoff workspace completed |
+| 4 | Pipeline and classification-output workspace completed |
