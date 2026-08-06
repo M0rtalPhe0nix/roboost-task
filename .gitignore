@@ -1,2 +1,9 @@
 
 AI Engineer Assessment/
+Files/
+DATA_DICTIONARY.xlsx
+analysis/generated/
+__pycache__/
+*.pyc
+*.sqlite
+*.local.yml
