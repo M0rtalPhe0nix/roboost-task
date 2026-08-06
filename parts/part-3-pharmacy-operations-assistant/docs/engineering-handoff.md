@@ -38,24 +38,20 @@ timestamp and ignore the partial current data month.
 2. **Business definitions** - have Operations approve the delivery SLA/threshold,
    business-day timezone, minimum comparison floor, rating semantics, and branch-opening
    treatment. Version changes and back-test them.
-3. **Evaluation** - maintain a reviewed question set covering supported routing,
-   unsupported declines, Arabic/English phrasing, numerical fidelity, suppression,
-   prompt injection, and adversarial requests. Gate releases on tool-choice and answer
-   faithfulness, not only prose similarity.
-4. **Access control** - put the API behind SSO or a non-public Telegram bot with a
+3. **Access control** - put the API behind SSO or a non-public Telegram bot with a
    Telegram-ID allowlist. Add rate limits, short retention, secret management, and
    environment-specific service accounts. Never expose ADK Web publicly.
-5. **Observability** - log request ID, authenticated actor, model/prompt/policy versions,
+4. **Observability** - log request ID, authenticated actor, model/prompt/policy versions,
    tool arguments, aggregate result hash, latency, token use, refusal reason, and errors.
    Do not log raw workbook rows or secrets. Monitor data freshness, tool failures,
    unsupported-question rate, cost, and response latency.
-6. **Privacy and security** - complete a threat model and privacy review. Preserve the
+5. **Privacy and security** - complete a threat model and privacy review. Preserve the
    aggregate-only tool boundary, enforce result-size limits, scan dependencies, and test
    that prompt content cannot change policy or access source rows.
-7. **Human validation and rollout** - begin in shadow mode with an analyst, then a small
+6. **Human validation and rollout** - begin in shadow mode with an analyst, then a small
    COO/operations pilot. Require users to validate consequential findings. Expand only
    after numerical and refusal-error reviews meet agreed thresholds.
-8. **Reliability** - use a persistent session service only if conversation history is
+7. **Reliability** - use a persistent session service only if conversation history is
    required; define timeouts, retries, circuit breaking, model fallback behavior, backup,
    incident response, and rollback. The analytics layer should remain usable without an
    LLM for investigation and regression testing.
