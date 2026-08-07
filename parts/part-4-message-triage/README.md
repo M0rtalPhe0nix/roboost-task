@@ -1,6 +1,6 @@
 # Part 4 - High-Volume Message Triage
 
-Working-pipeline workspace for Part 4, Option C: classify a full day of customer messages into
+Runnable final pipeline for Part 4, Option C: classify a full day of customer messages into
 refund request, complaint, order inquiry, compliment, spam, or urgent escalation within the
 assessment's USD 1 API budget.
 
@@ -11,8 +11,9 @@ The supplied corpus contains 2,204 conversations and 5,551 customer-authored tur
 The corpus parser, leakage-safe message representation, rule gate, Gemini structured-output
 adapter, output validation, JSONL exporter, append-only cost ledger, and pre-request budget guard
 are implemented. The paid full-corpus run completed for all 5,551 eligible messages. A blinded,
-conversation-disjoint 1,000-message review set is prepared; human gold labels and quality metrics
-remain outstanding.
+conversation-disjoint evaluation workflow is implemented and tested, but no human annotation or
+quality evaluation will be performed for this submission. No accuracy, F1, or calibrated-confidence
+claim is made.
 
 Verified corpus profile:
 
@@ -161,45 +162,23 @@ for inspection, forecasting, or evaluation.
 }
 ```
 
-Confidence bands are operational placeholders tied to the decision path until calibrated on the
-200-message calibration partition. They are not model self-confidence scores.
+Confidence bands are uncalibrated operational placeholders tied to the decision path. They are not
+model self-confidence scores or measured probabilities.
 
-## Evaluation
+## Evaluation decision
 
-The deterministic review sample is already prepared from the completed run:
+The repository includes deterministic sampling and scoring code plus tests for a possible
+conversation-disjoint 200-message calibration and 800-message held-out review. That human review
+will not be performed for this submission, so:
 
-- 200 calibration rows and 800 held-out rows.
-- Conversation-disjoint partitions; no conversation can appear in both.
-- Stratification by predicted routing label, including all 11 predicted urgent escalations.
-- Reviewer queues contain message text and past context but no predictions.
-- A separate manifest contains predictions, sampling weights, and the frozen configuration hash.
+- `outputs/evaluation/` intentionally contains no review queues or reports;
+- no gold labels or label-level quality metrics are submitted;
+- confidence bands remain uncalibrated placeholders; and
+- the final claims are limited to completeness, schema validity, leakage controls, deterministic
+  tests, provider usage, and measured cost.
 
-The local review queues contain assessment text and are intentionally ignored by Git. Fill only
-`gold_intent`, `gold_is_urgent`, `reviewer_status`, and `reviewer_notes`; do not reorder rows or edit
-IDs. Start with calibration and keep the held-out gold labels unopened until the annotation guide
-and classifier decision are frozen:
-
-```bash
-uv run triage score-evaluation \
-  --review-csv outputs/evaluation/calibration-review.csv \
-  --split calibration \
-  --output outputs/evaluation/calibration-report.json
-
-uv run triage score-evaluation \
-  --review-csv outputs/evaluation/heldout-review.csv \
-  --split heldout \
-  --output outputs/evaluation/heldout-report.json
-```
-
-The scorer refuses partial or invalid reviews, derives urgent-escalation routing with the same
-precedence rule, and reports raw and inverse-sampling-weighted accuracy, macro-F1, per-label
-precision/recall/F1, confusion matrices, urgency metrics, and an error CSV. No quality metric is
-claimed until a human completes and signs off the gold labels. See
-[the evaluation protocol](docs/evaluation.md) for exact instructions and evidence.
-
-Remaining submission work is the human review, calibration decision, held-out scoring, and final
-label-level error analysis. The classifications, configuration hash, response IDs, token usage,
-and cost evidence already exist.
+The unused workflow is documented in [the evaluation record](docs/evaluation.md) so the absence of
+quality metrics is explicit rather than implied.
 
 ## Decision boundary
 
@@ -207,9 +186,9 @@ Classify only inbound customer-authored turns. Earlier conversation turns may be
 
 Urgency is limited to explicit legal, regulatory, or social-media escalation threats and credible safety, health, or personal-data harm. Ordinary anger and churn intent do not meet that bar.
 
-Use a high-precision deterministic Rule Gate for clear urgent and spam cases, then a batched Gemini Flash-Lite structured-output fallback only for ambiguity. The ordinary full-corpus run has a hard USD 0.80 maximum, retaining USD 0.20 safety margin below the assessment cap. Debug audit reasons are calibration-only and must be disabled in final output; confidence bands are calibrated operational labels, not model self-ratings.
+Use a high-precision deterministic Rule Gate for clear urgent and spam cases, then a batched Gemini Flash-Lite structured-output fallback only for ambiguity. The ordinary full-corpus run has a hard USD 0.80 maximum, retaining USD 0.20 safety margin below the assessment cap. Debug audit reasons are disabled in final output; confidence bands are uncalibrated operational placeholders, not model self-ratings.
 
-## Intended workspace layout
+## Workspace layout
 
 ```text
 part-4-message-triage/
@@ -220,13 +199,13 @@ part-4-message-triage/
 └── outputs/      # Final classifications and submission-safe evidence
 ```
 
-## Evaluation boundary
+## Quality boundary
 
-Create a manually reviewed, stratified 1,000-message evaluation set: 200 calibration messages and 800 held-out messages. Improve rules, prompts, thresholds, batching, and model choice using calibration only, then freeze them before running the held-out evaluation. Final output preserves the source `seed_id`, original turn index, intent, urgent flag, triage label, decision source, and confidence band.
+No human-labeled evaluation set or accuracy metric is included in the final submission. The output preserves the source `seed_id`, original turn index, intent, urgent flag, triage label, decision source, and uncalibrated confidence band. The repository claims complete processing and deterministic contract coverage, not measured classification quality.
 
 ## References
 
 - [Part 4 handoff](../../handoffs/roboost-assessment-part-4-handoff.md)
 - [Assessment brief](../../AI_Engineer_Task.docx.pdf)
 - [Message Triage vocabulary](../../CONTEXT.md#message-triage)
-- Related ADRs: [`0001`](../../docs/adr/0001-separate-intent-from-urgency.md), [`0002`](../../docs/adr/0002-use-only-available-conversation-history.md), [`0003`](../../docs/adr/0003-use-a-rule-gate-with-model-fallback.md), [`0004`](../../docs/adr/0004-freeze-before-held-out-evaluation.md)
+- Related ADRs: [`0001`](../../adrs/0001-separate-intent-from-urgency.md), [`0002`](../../adrs/0002-use-only-available-conversation-history.md), [`0003`](../../adrs/0003-use-a-rule-gate-with-model-fallback.md), [`0004`](../../adrs/0004-freeze-before-held-out-evaluation.md)

@@ -1,39 +1,39 @@
 # Handoff: Part 4 - High-Volume Message Triage
 
-## Next-session objective
+## Submission status
 
-Build and run the Option C customer-message triage pipeline, submit classifications and runnable code, and prepare its short explanatory document.
+Complete within the selected submission boundary. The Option C pipeline classified every eligible
+customer-authored turn, preserved the required output fields, and recorded provider usage below the
+USD 1 task limit. No human quality evaluation is planned or claimed.
 
-## Read first
+## Canonical artifacts
 
-- Shared vocabulary: `./roboost-task/CONTEXT.md` (Message Triage section)
-- Decisions: `./roboost-task/docs/adr/0001-separate-intent-from-urgency.md` through `0004-freeze-before-held-out-evaluation.md`
-- Data: `./roboost-task/AI Engineer Assessment/Messages Dataset/dm_message_corpus_10k.json`
-- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 4, Option C)
+- [Part README and runnable commands](../parts/part-4-message-triage/README.md)
+- [Final classifications](../parts/part-4-message-triage/outputs/classifications.jsonl)
+- [Approach document](../parts/part-4-message-triage/docs/approach.md)
+- [Cost ledger](../parts/part-4-message-triage/outputs/cost-ledger.jsonl)
+- [Evaluation decision record](../parts/part-4-message-triage/docs/evaluation.md)
 
-## Settled scope
+## Final run evidence
 
-- Classify only inbound customer-authored turns. Brand turns are prior-conversation context only. The supplied file contains 2,204 conversations and 5,551 customer turns, despite the brief calling it 10,000 messages.
-- Use only earlier turns in the conversation for a message; never future turns.
-- Preserve `intent` (refund request, complaint, order inquiry, compliment, spam) and independent `is_urgent`, then derive one required `triage_label`; urgent escalation takes precedence.
-- Urgent means explicit legal/regulatory/social-media escalation or credible safety, health, or personal-data harm. Ordinary anger or churn intent is not urgent.
-- Use a high-precision deterministic Rule Gate for obvious spam/urgent cases and a batched Gemini Flash-Lite structured-output Model Fallback for ambiguity.
-- The ordinary full-corpus run must stop at USD 0.80, leaving USD 0.20 unused below the task cap. Do not spend blindly on retries.
-- Audit reasons are debug/calibration-only behind a switch and disabled for the final full run. Final confidence is low/medium/high as a calibrated operational band, never raw LLM self-confidence.
-- Build a manually reviewed, stratified 1,000-message evaluation set: 200 calibration, 800 held-out. Freeze rules/prompt/model/batching before reporting held-out results.
-- Final output should preserve `seed_id` and original turn index, intent, urgent flag, triage label, decision source, and confidence band. Debug fields are optional/off for final run.
+- Source corpus: 2,204 conversations and 10,000 total turns.
+- Eligible triage set: 5,551 customer-authored turns; 4,449 brand turns are context only.
+- Decision flow: narrow high-precision rule gate, then batched structured output from
+  `gemini-3.5-flash-lite` for unresolved messages.
+- Configuration hash: `aacd6cb395fc4762708497418f6bd7adfd177b67d75ea5a36a340f398167ffa2`.
+- Provider usage: 574,833 input tokens and 157,498 billed output tokens over 154 completed
+  requests.
+- Measured completed-request cost: USD 0.566264. Conservative committed cost: USD 0.574427.
+- Output: exactly 5,551 validated rows in source order.
 
-## Open work
+## Quality boundary
 
-- Securely locate/configure the issued Gemini API key via ignored environment settings; never write it to handoff/docs/repo.
-- Inspect the corpus for language, label prevalence, and rules candidates. Create annotation guidance before human labeling.
-- Implement usage metering and an enforceable pre-request spend guard; run small calibration batches before the one final full run.
-- Define confidence calibration from the 200 labels and evaluate all required classifications on the frozen 800.
-- Produce a transparent final README: count mismatch, decision hierarchy, cost ledger, model/version/prompt hashes, quality results, and limitations.
+The repository retains tested sampling and scoring utilities, but no human review queues, gold
+labels, accuracy, macro-F1, per-label recall, or calibrated-confidence claims are included. The
+`confidence_band` field is an uncalibrated operational placeholder, not a probability.
 
-## Suggested skills
-
-- `domain-modeling` for label-definition changes.
-- `tdd` if building tests for rule routing and schema validation.
-- `spreadsheets:Spreadsheets` if the human-labeling/evaluation worksheet is created.
-- `openai-docs` is not relevant; use official Gemini documentation/pricing only when current API behavior needs verification.
+Verification: `uv run pytest`, `uv run ruff check src tests`, `uv run triage inspect`, and
+`uv run triage forecast`. References: [shared vocabulary](../CONTEXT.md#message-triage),
+[assessment brief](../AI_Engineer_Task.docx.pdf), and ADRs
+[0001](../adrs/0001-separate-intent-from-urgency.md) through
+[0004](../adrs/0004-freeze-before-held-out-evaluation.md).

@@ -47,10 +47,9 @@ the supplied anonymized pharmacy workbook, and a
 2. Open the Downloads folder and extract `pharmacy-operations-assistant.zip`. Open the
    extracted `pharmacy-operations-assistant` folder. The correct folder contains
    `README.md`, `pyproject.toml`, and the `scripts` and `data` folders.
-3. Confirm that the supplied workbook is at
-   `data/operations_data_anonymized.xlsx`. The workbook is not included in the public
-   download. If the `data` folder is empty, copy the supplied
-   `operations_data_anonymized.xlsx` file into it before continuing.
+3. Confirm that the included anonymized workbook is at
+   `data/operations_data_anonymized.xlsx`. Do not replace it with confidential patient,
+   prescription, customer, or employee data.
 4. Open a terminal in the extracted `pharmacy-operations-assistant` folder:
 
    - **Windows 11:** Right-click an empty area inside the folder and choose **Open in

@@ -11,12 +11,12 @@ control.
 
 ## Image contract
 
-The Docker image contains the app, locked production dependencies, and the ignored local
-workbook at `data/operations_data_anonymized.xlsx`. During the build, the workbook is
+The Docker image contains the app, locked production dependencies, and the included
+anonymized assessment workbook at `data/operations_data_anonymized.xlsx`. During the build, the workbook is
 validated and converted to `data/operations.runtime.csv.gz`; the worker reads this
 compact typed dataset to avoid loading Excel with openpyxl inside the 256 MB runtime.
-Build from this Part 3 directory; a fresh Git clone does not contain the workbook and
-therefore cannot build the image without the authorized data file.
+Build from this Part 3 directory; a fresh Git clone contains the workbook required by
+the image build. Keep repository and image access limited to authorized assessment reviewers.
 
 ```bash
 docker build --platform linux/amd64 \

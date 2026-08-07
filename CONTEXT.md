@@ -42,9 +42,9 @@ _Avoid_: Fallback, model classifier
 The batched, structured-output model stage used only when the Rule Gate cannot safely make a decision.
 _Avoid_: Rule gate, retry
 
-**Evaluation Set**:
-A manually reviewed, stratified set of 1,000 Customer Messages used to measure triage quality. It is partitioned into 200 calibration messages and 800 held-out test messages.
-_Avoid_: Production output, training data
+**Evaluation Workflow**:
+An implemented but unexecuted design for a manually reviewed, stratified set of 1,000 Customer Messages, partitioned into 200 calibration messages and 800 held-out test messages. No human labels or quality metrics are included in the final submission.
+_Avoid_: Submitted evaluation result, production output, training data
 
 **Option C Execution Budget**:
 The maximum permitted Gemini API spend for the normal full-corpus triage run: USD 0.80. The remaining USD 0.20 of the assessment limit is an unused safety margin.
@@ -55,8 +55,8 @@ A short explanation of a triage outcome used only during debugging and calibrati
 _Avoid_: Final classification, source evidence
 
 **Confidence Band**:
-An operational low, medium, or high confidence label derived from the decision path and calibrated accuracy, rather than a model's unverified self-rating.
-_Avoid_: Probability, model self-confidence
+An uncalibrated low, medium, or high operational placeholder derived from the decision path, rather than a probability or the model's self-rating. The final submission does not claim measured reliability for these bands.
+_Avoid_: Probability, calibrated accuracy, model self-confidence
 
 ## Listing Intelligence
 
@@ -163,8 +163,8 @@ The brand for which an AI Summary is generated as the client. The other brands i
 _Avoid_: Market-wide owner, universal client
 
 **Focal-Brand View**:
-One AI Summary that treats exactly one comparison brand as the Focal Brand. The assessment will produce one view each for Lumen Coffee, Solara Coffee, and Vera Coffee.
-_Avoid_: Combined verdict, all-brand summary
+One production AI Summary that treats exactly one comparison brand as the Focal Brand. The assessment report uses all three supplied brands to ground the product design but does not claim three separately generated client summaries.
+_Avoid_: Combined production verdict, all-brand client ownership
 
 **Observation**:
 An evidence-bound statement describing a pattern in public review data. It does not assert an unobserved cause or promised business outcome.
@@ -212,6 +212,6 @@ _Avoid_: Proven cause, review signal
 A pattern in customer comments that provides supporting experience evidence but does not establish operational causation.
 _Avoid_: Measured contributor, proven cause
 
-**Koyeb Demo Deployment**:
-The optional public preview of the Pharmacy Operations Assistant, deployed as one Koyeb free web service. It is not the canonical runtime because the free instance can scale to zero and has no persistent volume.
-_Avoid_: Production deployment, canonical handoff
+**Northflank Assessment Deployment**:
+The temporary public Telegram preview of the Pharmacy Operations Assistant, deployed as one continuously running Northflank worker using a private image. It is assessment-only and is not a production deployment or the canonical local handoff.
+_Avoid_: Production deployment, canonical local runtime

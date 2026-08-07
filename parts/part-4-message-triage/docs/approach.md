@@ -31,14 +31,12 @@ Gemini's official pricing lists `gemini-3.5-flash-lite` at USD 0.30 per million 
 2.50 per million output tokens for standard paid requests. Pricing must be rechecked before the
 final paid run.
 
-## Evaluation plan
+## Evaluation boundary
 
-Create a manually reviewed, stratified set of 1,000 customer messages. Use 200 only for calibration,
-including rule and prompt changes, and keep 800 sealed for a single frozen evaluation. Report intent
-macro-F1, per-label precision/recall/F1, urgent precision/recall, urgent-escalation routing quality,
-rule-gate coverage and accuracy, schema failure rate, total provider tokens, and actual USD cost.
+The repository retains a tested design for a manually reviewed, stratified set of 1,000 customer
+messages: 200 for calibration and 800 for a conversation-disjoint held-out evaluation. That human
+evaluation will not be performed for the final submission.
 
 The full run produced 5,551 classifications at USD 0.566264 measured cost and USD 0.574427
-conservative committed cost. The deterministic 200/800 review queues are prepared, but human gold
-labels are not complete. Quality results must not be inferred from model predictions or reported
-until the scorer accepts a completed review file.
+conservative committed cost. No review queues, gold labels, calibrated confidence bands, or quality
+metrics are submitted. Quality must not be inferred from model predictions.

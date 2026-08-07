@@ -3,14 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from google.adk.evaluation.eval_config import EvalConfig
 from google.adk.evaluation.eval_set import EvalSet
 from google.adk.evaluation.local_eval_sets_manager import LocalEvalSetsManager
 
 PROJECT_DIR = Path(__file__).parents[1]
-EVALS_DIR = PROJECT_DIR / "evals"
 EVAL_SET_PATH = PROJECT_DIR / "app" / "pharmacy_operations_core_behaviors_v1.evalset.json"
-EVAL_CONFIG_PATH = EVALS_DIR / "eval_config.json"
 
 
 def test_eval_set_matches_the_installed_adk_schema() -> None:
@@ -67,11 +64,3 @@ def test_eval_set_covers_supported_routing_and_safety_boundaries() -> None:
         "branch",
         "rider",
     ]
-
-
-def test_eval_config_uses_exact_trajectory_and_semantic_response_scoring() -> None:
-    config = EvalConfig.model_validate_json(EVAL_CONFIG_PATH.read_text(encoding="utf-8"))
-
-    assert set(config.criteria) == {"tool_trajectory_avg_score", "final_response_match_v2"}
-    assert config.criteria["tool_trajectory_avg_score"].threshold == 1.0
-    assert config.criteria["final_response_match_v2"].threshold == 0.8

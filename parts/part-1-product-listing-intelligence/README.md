@@ -10,8 +10,9 @@ Part 1 is a product-reasoning deliverable rather than a runnable build. Its cano
 | --- | --- |
 | [`outputs/part1-report.md`](outputs/part1-report.md) | Final written response covering the proposed pipeline, all five assessment questions, moderation operations, auditability, metrics, cost controls, limitations, and design rationale |
 | [`outputs/Part1.svg`](outputs/Part1.svg) | Self-contained architecture diagram for the listing-intelligence pipeline and taxonomy-adaptation workflow |
+| [`outputs/Part 1 — AI Product Understanding & Problem Framing (1).pdf`](outputs/Part%201%20%E2%80%94%20AI%20Product%20Understanding%20%26%20Problem%20Framing%20%281%29.pdf) | Submission-ready PDF export of the written response |
 
-The repository-wide `*.pdf` ignore rule keeps local PDF exports out of version control. The Markdown report and SVG above are the reviewable source artifacts.
+The Markdown report and SVG are the reviewable source artifacts; the PDF is the assessor-facing export.
 
 ## What the solution covers
 
@@ -46,6 +47,7 @@ The design uses deterministic validation, normalization, and policy rules first;
 part-1-product-listing-intelligence/
 ├── README.md
 └── outputs/
+    ├── Part 1 — AI Product Understanding & Problem Framing (1).pdf
     ├── Part1.svg
     └── part1-report.md
 ```
@@ -57,4 +59,4 @@ There is no Part 1 application, source module, or automated test suite because t
 - [Part 1 handoff](../../handoffs/roboost-assessment-part-1-handoff.md)
 - [Assessment brief](../../AI_Engineer_Task.docx.pdf)
 - [Listing Intelligence vocabulary](../../CONTEXT.md#listing-intelligence)
-- Decision history: [`0005`](../../docs/adr/0005-hold-ambiguous-high-risk-listings.md), [`0006`](../../docs/adr/0006-prioritize-review-by-expected-harm.md), [`0007`](../../docs/adr/0007-govern-category-ontology-changes.md), [`0008`](../../docs/adr/0008-use-a-cost-tiered-listing-cascade.md), and [`0009`](../../docs/adr/0009-roll-out-injection-detection-in-monitor-mode.md)
+- Decision history: [`0005`](../../adrs/0005-hold-ambiguous-high-risk-listings.md), [`0006`](../../adrs/0006-prioritize-review-by-expected-harm.md), [`0007`](../../adrs/0007-govern-category-ontology-changes.md), [`0008`](../../adrs/0008-use-a-cost-tiered-listing-cascade.md), [`0009`](../../adrs/0009-roll-out-injection-detection-in-monitor-mode.md), and final allocation [`0018`](../../adrs/0018-use-final-review-capacity-allocation.md)

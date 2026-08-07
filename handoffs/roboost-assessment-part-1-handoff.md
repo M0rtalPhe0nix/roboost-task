@@ -1,42 +1,40 @@
 # Handoff: Part 1 - Product Listing Intelligence
 
-## Next-session objective
+## Submission status
 
-Produce the written response for Case Study 2: E-Commerce Marketplace - Product Listing Intelligence. Make it implementation-ready and explicitly answer all five assessment questions.
+Complete. Part 1 answers Case Study 2 as a written product-reasoning deliverable with a
+self-contained architecture diagram. No application build is required.
 
-## Read first
+## Canonical artifacts
 
-- Shared vocabulary: `./roboost-task/CONTEXT.md` (Listing Intelligence section)
-- Decisions: `./roboost-task/docs/adr/0005-hold-ambiguous-high-risk-listings.md` through `0009-roll-out-injection-detection-in-monitor-mode.md`
-- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 1, Case Study 2)
+- [Written report](../parts/part-1-product-listing-intelligence/outputs/part1-report.md)
+- [Architecture diagram](../parts/part-1-product-listing-intelligence/outputs/Part1.svg)
+- [PDF export](../parts/part-1-product-listing-intelligence/outputs/Part%201%20%E2%80%94%20AI%20Product%20Understanding%20%26%20Problem%20Framing%20%281%29.pdf)
+- [Part README](../parts/part-1-product-listing-intelligence/README.md)
 
-## Settled scope
+## Final decisions
 
-- The marketplace is Arabic-English regional; code-switching is normal.
-- Prioritize an offer-focused, professional submission due within one month.
-- Use a cost-tiered cascade: deterministic rules, compact text/vision candidate selection, then LLMs only for ambiguity and standardized description generation.
-- Confirmed policy violations can be auto-rejected. Ambiguous high-risk listings are held unpublished, including when human review is at capacity; capacity pressure is not evidence of a violation.
-- Allocate the 5% review capacity 80% expected-harm risk queue, 15% uncertainty/novelty, 5% stratified audit; safety emergencies preempt the queue.
-- Use a governed category ontology with Arabic-English aliases. It can return an explicit category-gap outcome but cannot autonomously create production categories.
-- Seller text, photos, and OCR are untrusted. Publication decisions require validated, evidence-linked fields and deterministic policy code, not raw content or unconstrained LLM extraction.
-- Injection detection starts monitor-and-flag only. Do not treat a detection as proof of prohibited content; measure bilingual false positives before it can hold listings.
-- Description tone is an allow-listed profile (for example neutral, concise, premium, friendly). It may alter wording only, never facts, category, or moderation.
+- Use a cost-tiered cascade: deterministic validation and policy rules, compact text and vision
+  models, then LLMs only for controlled ambiguity and description generation.
+- Treat seller text, photos, and OCR as untrusted input. Only validated, evidence-linked fields may
+  drive deterministic publication decisions.
+- Auto-reject only confirmed policy violations. Hold ambiguous high-risk listings unpublished for
+  review; review-capacity pressure is not evidence of a violation.
+- Allocate review throughput initially as 70% prohibited gray-zone and detector disagreement, 20%
+  adversarial or suspected-counterfeit cases, 1% representative unknown-category cases, and 9%
+  stratified audit. Safety emergencies may preempt the allocation.
+- Govern category changes through a bilingual ontology and taxonomy owner. Novel clusters may
+  produce proposals but never publish production categories autonomously.
+- Keep injection detection monitor-and-flag until bilingual false-positive evidence justifies a
+  stronger action.
 
-## Key guardrail research
+## References and verification
 
-- OWASP LLM01 Prompt Injection: https://genai.owasp.org/llmrisk/llm01-prompt-injection/
-- OWASP prevention cheat sheet: https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
-- Google Model Armor overview: https://docs.cloud.google.com/model-armor/overview?hl=en
+- [Shared vocabulary](../CONTEXT.md#listing-intelligence)
+- [Assessment brief](../AI_Engineer_Task.docx.pdf)
+- ADRs [0005](../adrs/0005-hold-ambiguous-high-risk-listings.md) through
+  [0009](../adrs/0009-roll-out-injection-detection-in-monitor-mode.md), plus final allocation
+  [0018](../adrs/0018-use-final-review-capacity-allocation.md)
 
-## Open work
-
-- Turn decisions into a concise narrative/pipeline diagram and quantified threshold policy.
-- State explicit assumptions on prohibited-item policy authority and model/provider availability.
-- Add metrics for safety recall, false holds/rejects, categorization quality, cost/listing, review yield, category-gap/drift rate, and description factuality.
-- Avoid claiming injection prevention is perfect; present defense in depth and adversarial testing.
-
-## Suggested skills
-
-- `domain-modeling` for any new language or durable decision.
-- `pdf:pdf` to cite/check the brief.
-- `excalidraw` only if an editable pipeline diagram materially improves the written deliverable.
+The Markdown report is present and the SVG passes XML well-formedness validation. There is no
+automated application test suite for this written-design part.

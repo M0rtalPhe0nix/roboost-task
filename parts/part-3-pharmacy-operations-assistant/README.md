@@ -53,8 +53,9 @@ ADK Web or private Telegram chat
 
 ## Run ADK Web locally
 
-Prerequisites: Python 3.11-3.14, a Gemini API key, internet access for first-time setup,
-and the supplied workbook at `data/operations_data_anonymized.xlsx`.
+Prerequisites: Python 3.11-3.14, a Gemini API key, and internet access for first-time setup.
+The supplied anonymized workbook is included at `data/operations_data_anonymized.xlsx`
+so the assessment prototype runs from a fresh clone.
 
 ```bash
 python scripts/run_adk_web.py
@@ -113,17 +114,9 @@ uv run pytest --cov=app --cov-report=term-missing
 ```
 
 These checks are deterministic and make no Gemini calls. The checked-in conversational
-eval covers routing, tool arguments, multi-turn drill-downs, causal restraint, the
-90-minute non-SLA guardrail, privacy, and unsupported questions. It consumes model quota
-and runs separately:
-
-```bash
-uv run adk eval \
-  app \
-  app/pharmacy_operations_core_behaviors_v1.evalset.json \
-  --config_file_path=evals/eval_config.json \
-  --print_detailed_results
-```
+eval set documents routing, tool arguments, multi-turn drill-downs, causal restraint, the
+90-minute non-SLA guardrail, privacy, and unsupported questions, but no live model-scored
+evaluation is claimed for the final submission.
 
 ## Reliability policy
 
@@ -146,12 +139,11 @@ All thresholds are versioned environment settings rather than model choices.
 
 ```text
 app/                     ADK agent, policy, deterministic analytics, Telegram transport
-data/                    ignored local workbook location
+data/                    included anonymized assessment workbook
 deploy/                  Northflank worker handoff
 docs/                    COO and engineering guides, plus the Telegram QR asset
-evals/                   live conversational evaluation settings
 scripts/                 local launcher and worker-dataset preparation
-tests/                   deterministic contract, analytics, eval-schema, and bot tests
+tests/                   deterministic contract, analytics, eval-set, and bot tests
 .env.example             safe configuration template
 compose.yaml             local ADK Web handoff
 Dockerfile               Telegram worker image
@@ -178,6 +170,7 @@ pyproject.toml, uv.lock  dependencies and reproducible lockfile
 - [COO usage guide](docs/coo-handoff.md)
 - [Engineering production-readiness guide](docs/engineering-handoff.md)
 - [Northflank deployment handoff](deploy/northflank-worker.md)
-- [Pharmacy domain ADR](../../docs/adr/0013-treat-part-3-as-a-pharmacy-domain.md)
-- [Evidence Strength ADR](../../docs/adr/0014-show-evidence-strength-for-operational-calculations.md)
-- [Measured contributors vs. customer signals ADR](../../docs/adr/0015-separate-measured-contributors-from-review-signals.md)
+- [Pharmacy domain ADR](../../adrs/0013-treat-part-3-as-a-pharmacy-domain.md)
+- [Evidence Strength ADR](../../adrs/0014-show-evidence-strength-for-operational-calculations.md)
+- [Measured contributors vs. customer signals ADR](../../adrs/0015-separate-measured-contributors-from-review-signals.md)
+- [Northflank assessment deployment ADR](../../adrs/0017-use-northflank-for-the-public-demo.md)

@@ -85,11 +85,12 @@ concurrency limit and monitor the live worker for OOM restarts.
 ## Deployment position
 
 The assessment bot runs as one Northflank deployment service because Telegram long
-polling needs a continuously running worker. The ignored workbook is validated and
-converted into a compact typed dataset during the image build; the worker reads that
-dataset instead of parsing Excel at runtime. The source workbook remains inside the
-private image and is never committed to Git. This simplifies the demo but means data
-changes require an image rebuild, and anyone with image access can extract the data.
+polling needs a continuously running worker. The supplied anonymized workbook is
+intentionally included in this assessment repository so a fresh clone is runnable. It is
+validated and converted into a compact typed dataset during the image build; the worker
+reads that dataset instead of parsing Excel at runtime. The workbook also remains inside
+the private image. This simplifies the demo but means data changes require an image
+rebuild, and anyone with repository or image access can extract the assessment data.
 Public Telegram access is limited to assessment review and must be disabled afterward.
 Availability and bounded in-memory sessions must not be described as production-grade. See the
 [Northflank worker handoff](../deploy/northflank-worker.md) for the exact boundary.

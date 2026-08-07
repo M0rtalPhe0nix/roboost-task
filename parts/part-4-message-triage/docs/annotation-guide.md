@@ -1,7 +1,7 @@
 # Message triage annotation guide
 
-Version: draft v1, for calibration-set review. This guide must be frozen with the classifier before
-held-out evaluation.
+Version: draft v1, retained as unexecuted evaluation-design documentation. No human annotation or
+held-out evaluation is included in the final submission.
 
 ## Unit and context boundary
 

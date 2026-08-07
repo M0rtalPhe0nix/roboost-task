@@ -1,50 +1,39 @@
 # Handoff: Part 3 - Pharmacy Operations Assistant
 
-## Next-session objective
+## Submission status
 
-Build and document the working Pharmacy Operations Assistant prototype, plus the COO and engineering handoff documents.
+Complete. The repository contains a runnable Google ADK assistant, Telegram transport, local ADK
+Web launcher, deterministic pandas analytics, Docker handoff, tests, and stakeholder documentation.
 
-## Read first
+## Canonical artifacts
 
-- Shared vocabulary: `./roboost-task/CONTEXT.md` (Pharmacy Operations section)
-- Decisions: `./roboost-task/docs/adr/0013-treat-part-3-as-a-pharmacy-domain.md` through `0016-use-koyeb-only-for-the-public-demo.md`
-- Data: `./roboost-task/AI Engineer Assessment/Operations Dataset/operations_data_anonymized.xlsx`
-- Brief: `./roboost-task/AI_Engineer_Task.pdf` (Part 3)
+- [Part README and setup](../parts/part-3-pharmacy-operations-assistant/README.md)
+- [COO usage guide](../parts/part-3-pharmacy-operations-assistant/docs/coo-handoff.md)
+- [Engineering production-readiness guide](../parts/part-3-pharmacy-operations-assistant/docs/engineering-handoff.md)
+- [Northflank worker handoff](../parts/part-3-pharmacy-operations-assistant/deploy/northflank-worker.md)
 
-## Settled scope
+## Final implementation
 
-- The data is authoritative: build a pharmacy assistant, not a restaurant assistant. The data dictionary identifies 64,619 delivery orders and 132 branches; brief references to restaurant and 120 branches are treated as stale/incorrect.
-- Stack preference: FastAPI + React + Docker + uv + pnpm.
-- The LLM interprets a COO question into an allow-listed, read-only query plan. All numbers and rankings are deterministically computed from the workbook. Answers include filters/definitions and evidence-strength context; do not expose raw query logic by default.
-- Evidence Strength is high/medium/low and considers observation count, time coverage, and completeness. Display underlying counts and suppress inadequate branch comparisons.
-- An assistant must decline unsupported questions (medication safety, inventory, staffing, definitive causation, etc.) and name the missing source.
-- For “why” questions, show measured timing contributors (dispatch/pickup/delivery) separately from customer-reported comment signals; neither is described as a proven root cause.
-- Primary COO interface: Telegram bot. React is internal/admin debugging only. Use a Telegram-ID allowlist and keep the bot non-public for an internal operations use case.
-- Koyeb is the optional public demo deployment. Docker Compose is the canonical handoff; do not rely on Koyeb free-tier availability or storage.
+- Google ADK and Gemini interpret plain-language questions and explain aggregate results.
+- One allow-listed `analyze_operations` tool delegates every calculation to deterministic pandas
+  code; the model cannot execute SQL or retrieve source rows.
+- The primary reviewer/COO interface is a private-chat Telegram bot. ADK Web is a loopback-only
+  development and review surface.
+- The supplied anonymized 64,619-order, 132-branch workbook is intentionally tracked at
+  `data/operations_data_anonymized.xlsx` so a fresh clone is runnable. It must not be replaced with
+  confidential patient, prescription, customer, or employee data.
+- The assessment worker runs on Northflank using a private image and one long-polling replica.
+- Evidence Strength, comparison floors, unsupported-question refusals, aggregate-only outputs, and
+  bounded conversation/session memory are enforced by code.
 
-## Data facts already verified
+## Verification boundary
 
-- One spreadsheet data sheet plus a data dictionary.
-- Fields include order/customer pseudonymous IDs, optional Arabic-English comments, rating, branch, delivery zone, rider, amount, created/shift/delivery/assigned/pickup timestamps.
-- Deterministic derived metrics: end-to-end delivery duration, dispatch lag, pickup lag.
-- Branch coverage is materially uneven; at least BR-131 and BR-132 begin late in the observed window, while other branch IDs have sparse records. Comparability safeguards are necessary.
+Run `uv run ruff check .` and `uv run pytest --cov=app --cov-report=term-missing`. The tests are
+deterministic and make no Gemini calls. A conversational eval set is retained as design evidence,
+but no live model-scored evaluation is claimed for the final submission.
 
-## Deployment research
-
-- Telegram Bot API: https://core.telegram.org/bots
-- Koyeb free instance: one 512 MB / 0.1 vCPU service, no persistent volume, scales to zero after one idle hour: https://www.koyeb.com/docs/reference/instances
-- Do not claim permanent free availability. Render sleeps after 15 minutes; Cloud Run needs a billing account and charges beyond free quotas.
-
-## Open work
-
-- Profile workbook dates, distributions, data quality, and define exact minimum-comparability thresholds from data.
-- Decide query-plan schema, allowed metric catalog, and natural-language routing/fallback behavior.
-- Build FastAPI analysis layer, Telegram adapter, React admin/debug UI, Docker Compose, Koyeb manifest/deployment notes, tests, and two short handoff documents.
-- Ensure no Gemini API key or bot token enters the repository.
-
-## Suggested skills
-
-- `spreadsheets:Spreadsheets` for workbook inspection and any output workbook.
-- `domain-modeling` for pharmacy terminology.
-- `browser:control-in-app-browser` for local UI QA if needed.
-- `sites:sites-building` only if `.openai/hosting.json` exists (otherwise do not use).
+References: [shared vocabulary](../CONTEXT.md#pharmacy-operations),
+[assessment brief](../AI_Engineer_Task.docx.pdf), ADRs
+[0013](../adrs/0013-treat-part-3-as-a-pharmacy-domain.md) through
+[0015](../adrs/0015-separate-measured-contributors-from-review-signals.md), and Northflank decision
+[0017](../adrs/0017-use-northflank-for-the-public-demo.md).

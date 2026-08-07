@@ -2,13 +2,13 @@
 
 ## Project Structure & Module Organization
 
-This is a four-part AI Engineer Assessment scaffold. Start with the root [README.md](README.md), then work in the relevant `parts/part-*/` directory. Each part owns its implementation, documentation, tests, and submission artifacts:
+This is a completed four-part AI Engineer Assessment submission. Start with the root [README.md](README.md), then work in the relevant `parts/part-*/` directory. Each part owns its implementation, documentation, tests, and submission artifacts:
 
-- `presentation/` holds the canonical self-contained HTML deliverable for Parts 1 and 2.
-- `apps/`, `src/`, and `tests/` are reserved for runnable work in Parts 3 and 4.
-- `docs/adr/` contains cross-cutting architecture decision records; `handoffs/` contains current continuation notes.
+- `outputs/` and `analysis/` hold the written deliverables and reproducible evidence for Parts 1 and 2.
+- `app/`, `src/`, and `tests/` hold runnable work for Parts 3 and 4.
+- `adrs/` contains cross-cutting architecture decision records; `handoffs/` contains current completion and continuation notes.
 - `shared/` is for code or schemas used by at least two parts. Do not create shared abstractions prematurely.
-- `outputs/` contains reproducible, review-safe artifacts. Source assessment data remains in the ignored `AI Engineer Assessment/` directory.
+- `outputs/` contains reproducible, review-safe artifacts. Part 2 and Part 4 source inputs remain ignored. The supplied anonymized Part 3 workbook is intentionally tracked so the prototype is runnable from a fresh clone.
 
 Read the part README, its matching handoff, `CONTEXT.md`, and linked ADRs before changing assumptions or terminology.
 
@@ -16,7 +16,7 @@ Read the part README, its matching handoff, `CONTEXT.md`, and linked ADRs before
 
 There is no repository-wide build system, package manifest, or test runner yet. Add verified, part-local commands to the part README when implementation begins. Prefer commands run from the part directory, such as `npm test`, `pytest`, or `docker compose up --build`, and state their purpose.
 
-For documentation changes, validate relative Markdown links and open HTML presentations locally before submitting. Do not record planned commands as if they had been run.
+For documentation changes, validate relative Markdown links and inspect final Markdown, SVG, and PDF artifacts before submitting. Do not record planned commands as if they had been run.
 
 ## Specification & Issue Workflow
 
@@ -34,4 +34,4 @@ Place tests in the owning part's `tests/` directory. Name tests after behavior, 
 
 ## Commit & Pull Request Guidelines
 
-Existing history uses short, imperative summaries (for example, `Add initial README files and directory structure`). Keep commits focused and describe the affected part. Pull requests should explain the deliverable or decision, link relevant assessment requirements or ADRs, list verification performed, and include screenshots for presentation/UI changes. Never commit raw assessment data, API keys, tokens, or local exports.
+Existing history uses short, imperative summaries (for example, `Add initial README files and directory structure`). Keep commits focused and describe the affected part. Pull requests should explain the deliverable or decision, link relevant assessment requirements or ADRs, list verification performed, and include screenshots for presentation/UI changes. Do not commit API keys, tokens, local exports, or additional raw assessment data. The tracked anonymized Part 3 workbook is the explicit assessment-only exception.
